@@ -135,22 +135,11 @@ copy_to_clipboard() {
     return 1
 }
 
-read_multiline() {
+read_single_line() {
     local prompt="$1"
-    local result=""
-
     echo -e "${CYAN}$prompt${NC}"
-    echo -e "${YELLOW}(Enter your text. Type 'END' on a new line when done)${NC}"
-    echo ""
-
-    while IFS= read -r line; do
-        if [ "$line" = "END" ]; then
-            break
-        fi
-        result+="$line"$'\n'
-    done
-
-    echo "$result"
+    read -r REPLY
+    echo "$REPLY"
 }
 
 # ============================================================================
@@ -167,7 +156,8 @@ run_interactive_mode() {
         echo -e "${GREEN}Using architecture file: $ARCH_FILE${NC}"
         CURRENT_ARCH=$(cat "$ARCH_FILE")
     else
-        CURRENT_ARCH=$(read_multiline "Describe your current architecture:")
+        echo -e "${YELLOW}Tip: Use --arch FILE to load from a file${NC}"
+        CURRENT_ARCH=$(read_single_line "Describe your current architecture (brief):")
     fi
 
     echo ""
@@ -177,14 +167,14 @@ run_interactive_mode() {
         echo -e "${GREEN}Using proposal file: $PROPOSAL_FILE${NC}"
         PROPOSED_CHANGE=$(cat "$PROPOSAL_FILE")
     else
-        PROPOSED_CHANGE=$(read_multiline "Describe your proposed change:")
+        echo -e "${YELLOW}Tip: Use --proposal FILE to load from a file${NC}"
+        PROPOSED_CHANGE=$(read_single_line "Describe your proposed change (brief):")
     fi
 
     echo ""
 
     # Get reason
-    echo -e "${CYAN}Why are you making this change? (one line)${NC}"
-    read -r CHANGE_REASON
+    CHANGE_REASON=$(read_single_line "Why are you making this change?")
 
     echo ""
 
@@ -246,7 +236,8 @@ run_api_mode() {
         echo -e "${GREEN}Using architecture file: $ARCH_FILE${NC}"
         CURRENT_ARCH=$(cat "$ARCH_FILE")
     else
-        CURRENT_ARCH=$(read_multiline "Describe your current architecture:")
+        echo -e "${YELLOW}Tip: Use --arch FILE to load from a file${NC}"
+        CURRENT_ARCH=$(read_single_line "Describe your current architecture (brief):")
     fi
 
     echo ""
@@ -256,14 +247,14 @@ run_api_mode() {
         echo -e "${GREEN}Using proposal file: $PROPOSAL_FILE${NC}"
         PROPOSED_CHANGE=$(cat "$PROPOSAL_FILE")
     else
-        PROPOSED_CHANGE=$(read_multiline "Describe your proposed change:")
+        echo -e "${YELLOW}Tip: Use --proposal FILE to load from a file${NC}"
+        PROPOSED_CHANGE=$(read_single_line "Describe your proposed change (brief):")
     fi
 
     echo ""
 
     # Get reason
-    echo -e "${CYAN}Why are you making this change? (one line)${NC}"
-    read -r CHANGE_REASON
+    CHANGE_REASON=$(read_single_line "Why are you making this change?")
 
     echo ""
     echo -e "${GREEN}Analyzing architecture...${NC}"
