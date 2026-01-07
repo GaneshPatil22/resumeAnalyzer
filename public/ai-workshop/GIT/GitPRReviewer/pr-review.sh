@@ -9,12 +9,12 @@
 #   ./pr-review.sh                    # Review changes vs main branch
 #   ./pr-review.sh --branch develop   # Review changes vs specific branch
 #   ./pr-review.sh --files "*.tsx"    # Review only specific files
-#   ./pr-review.sh --api              # Use Gemini API directly
+#   ./pr-review.sh --api              # Uses Groq API directly
 #   ./pr-review.sh --help             # Show this help
 #
 # REQUIREMENTS:
 #   - Git repository
-#   - For --api mode: GEMINI_API_KEY environment variable
+#   - For --api mode: GROQ_API_KEY environment variable
 #
 # AI TECHNIQUES: Role-Based + Constraint-Based + Few-Shot Prompting
 # ============================================================================
@@ -47,14 +47,14 @@ show_help() {
     echo "  ./pr-review.sh                    Review changes vs main"
     echo "  ./pr-review.sh --branch develop   Review vs specific branch"
     echo "  ./pr-review.sh --files \"*.tsx\"    Review specific files"
-    echo "  ./pr-review.sh --api              Use Gemini API directly"
+    echo "  ./pr-review.sh --api              Use Groq API directly"
     echo "  ./pr-review.sh --context          Include project context files"
     echo "  ./pr-review.sh --help             Show this help"
     echo ""
     echo "OPTIONS:"
     echo "  --branch, -b    Base branch to compare against (default: main)"
     echo "  --files, -f     Glob pattern for files to include"
-    echo "  --api, -a       Use Gemini API instead of clipboard"
+    echo "  --api, -a       Use Groq API instead of clipboard"
     echo "  --context, -c   Include PROJECT_CONTEXT.md and CODING_GUIDELINES.md"
     echo ""
     echo "EXAMPLES:"
@@ -64,8 +64,8 @@ show_help() {
     echo "  ./pr-review.sh --api --context"
     echo ""
     echo "API SETUP:"
-    echo "  export GEMINI_API_KEY='your-api-key-here'"
-    echo "  Get free key: https://makersuite.google.com/app/apikey"
+    echo "  export GROQ_API_KEY='your-api-key-here'"
+    echo "  Get free key: https://console.groq.com/keys"
     echo ""
 }
 
@@ -299,12 +299,12 @@ run_api_mode() {
     check_git_repo
     check_branch_exists
 
-    if [ -z "$GEMINI_API_KEY" ]; then
-        echo -e "${RED}Error: GEMINI_API_KEY not set.${NC}"
+    if [ -z "$GROQ_API_KEY" ]; then
+        echo -e "${RED}Error: GROQ_API_KEY not set.${NC}"
         echo ""
         echo "Setup:"
-        echo "  export GEMINI_API_KEY='your-key'"
-        echo "  Get key: https://makersuite.google.com/app/apikey"
+        echo "  export GROQ_API_KEY='your-key'"
+        echo "  Get key: https://console.groq.com/keys"
         exit 1
     fi
 
@@ -338,25 +338,24 @@ $DIFF"
     # Escape for JSON
     ESCAPED_PROMPT=$(echo "$FULL_PROMPT" | jq -Rs '.')
 
-    # API request
+    # API request (OpenAI-compatible format for Groq)
     REQUEST_BODY=$(cat << EOF
 {
-  "contents": [{
-    "parts": [{
-      "text": $ESCAPED_PROMPT
-    }]
+  "model": "llama-3.3-70b-versatile",
+  "messages": [{
+    "role": "user",
+    "content": $ESCAPED_PROMPT
   }],
-  "generationConfig": {
-    "temperature": 0.2,
-    "maxOutputTokens": 2000
-  }
+  "temperature": 0.2,
+  "max_tokens": 2000
 }
 EOF
 )
 
     RESPONSE=$(curl -s -X POST \
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY" \
+        "https://api.groq.com/openai/v1/chat/completions" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $GROQ_API_KEY" \
         -d "$REQUEST_BODY")
 
     # Check for errors
@@ -366,8 +365,8 @@ EOF
         exit 1
     fi
 
-    # Extract review
-    REVIEW=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+    # Extract review (OpenAI format)
+    REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
     if [ -z "$REVIEW" ] || [ "$REVIEW" = "null" ]; then
         echo -e "${RED}Error: Could not parse response.${NC}"

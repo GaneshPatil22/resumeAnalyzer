@@ -8,11 +8,11 @@
 # USAGE:
 #   ./architecture-review.sh               # Interactive mode
 #   ./architecture-review.sh --arch FILE   # Include architecture file
-#   ./architecture-review.sh --api         # Use Gemini API directly
+#   ./architecture-review.sh --api         # Use Groq API directly
 #   ./architecture-review.sh --help        # Show help
 #
 # REQUIREMENTS:
-#   - For --api mode: GEMINI_API_KEY environment variable
+#   - For --api mode: GROQ_API_KEY environment variable
 #
 # AI TECHNIQUES: Chain of Thought + Role-Based + Iterative Refinement
 # ============================================================================
@@ -45,7 +45,7 @@ show_help() {
     echo "  ./architecture-review.sh               Interactive mode"
     echo "  ./architecture-review.sh --arch FILE   Include architecture file"
     echo "  ./architecture-review.sh --proposal F  Read proposal from file"
-    echo "  ./architecture-review.sh --api         Use Gemini API"
+    echo "  ./architecture-review.sh --api         Use Groq API"
     echo "  ./architecture-review.sh --help        Show this help"
     echo ""
     echo "INTERACTIVE MODE:"
@@ -59,8 +59,8 @@ show_help() {
     echo "  ./architecture-review.sh --arch ./docs/arch.md --proposal ./proposal.md"
     echo ""
     echo "API SETUP:"
-    echo "  export GEMINI_API_KEY='your-key'"
-    echo "  Get free key: https://makersuite.google.com/app/apikey"
+    echo "  export GROQ_API_KEY='your-key'"
+    echo "  Get free key: https://console.groq.com/keys"
     echo ""
 }
 
@@ -227,12 +227,12 @@ run_api_mode() {
     echo "==================================="
     echo ""
 
-    if [ -z "$GEMINI_API_KEY" ]; then
-        echo -e "${RED}Error: GEMINI_API_KEY not set.${NC}"
+    if [ -z "$GROQ_API_KEY" ]; then
+        echo -e "${RED}Error: GROQ_API_KEY not set.${NC}"
         echo ""
         echo "Setup:"
-        echo "  export GEMINI_API_KEY='your-key'"
-        echo "  Get key: https://makersuite.google.com/app/apikey"
+        echo "  export GROQ_API_KEY='your-key'"
+        echo "  Get key: https://console.groq.com/keys"
         exit 1
     fi
 
@@ -284,25 +284,24 @@ $CHANGE_REASON"
     # Escape for JSON
     ESCAPED_PROMPT=$(echo "$FULL_PROMPT" | jq -Rs '.')
 
-    # API request
+    # API request (OpenAI-compatible format for Groq)
     REQUEST_BODY=$(cat << EOF
 {
-  "contents": [{
-    "parts": [{
-      "text": $ESCAPED_PROMPT
-    }]
+  "model": "llama-3.3-70b-versatile",
+  "messages": [{
+    "role": "user",
+    "content": $ESCAPED_PROMPT
   }],
-  "generationConfig": {
-    "temperature": 0.3,
-    "maxOutputTokens": 3000
-  }
+  "temperature": 0.3,
+  "max_tokens": 3000
 }
 EOF
 )
 
     RESPONSE=$(curl -s -X POST \
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY" \
+        "https://api.groq.com/openai/v1/chat/completions" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $GROQ_API_KEY" \
         -d "$REQUEST_BODY")
 
     # Check for errors
@@ -312,8 +311,8 @@ EOF
         exit 1
     fi
 
-    # Extract review
-    REVIEW=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+    # Extract review (OpenAI format)
+    REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
     if [ -z "$REVIEW" ] || [ "$REVIEW" = "null" ]; then
         echo -e "${RED}Error: Could not parse response.${NC}"
@@ -349,15 +348,13 @@ Think through this step by step."
 
         FOLLOWUP_BODY=$(cat << EOF
 {
-  "contents": [{
-    "parts": [{
-      "text": $ESCAPED_FOLLOWUP
-    }]
+  "model": "llama-3.3-70b-versatile",
+  "messages": [{
+    "role": "user",
+    "content": $ESCAPED_FOLLOWUP
   }],
-  "generationConfig": {
-    "temperature": 0.3,
-    "maxOutputTokens": 2000
-  }
+  "temperature": 0.3,
+  "max_tokens": 2000
 }
 EOF
 )
@@ -367,11 +364,12 @@ EOF
         echo ""
 
         FOLLOWUP_RESPONSE=$(curl -s -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY" \
+            "https://api.groq.com/openai/v1/chat/completions" \
             -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GROQ_API_KEY" \
             -d "$FOLLOWUP_BODY")
 
-        FOLLOWUP_ANSWER=$(echo "$FOLLOWUP_RESPONSE" | jq -r '.candidates[0].content.parts[0].text')
+        FOLLOWUP_ANSWER=$(echo "$FOLLOWUP_RESPONSE" | jq -r '.choices[0].message.content')
 
         echo -e "${CYAN}Follow-up Response:${NC}"
         echo "─────────────────────"

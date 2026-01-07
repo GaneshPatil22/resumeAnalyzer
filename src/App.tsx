@@ -71,9 +71,12 @@ function App() {
             </svg>
             AI Workshop Docs
           </a>
-          <h1 className="text-3xl font-bold text-gray-900">Resume Analyzer</h1>
-          <p className="text-gray-600 mt-2">
-            Analyze your resume against job descriptions and get actionable improvement suggestions
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900">Resume Analyzer</h1>
+            <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">v2.0</span>
+          </div>
+          <p className="text-gray-600">
+            AI-powered resume analysis to match your skills with job requirements
           </p>
         </header>
 

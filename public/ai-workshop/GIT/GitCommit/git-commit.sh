@@ -7,12 +7,12 @@
 #
 # USAGE:
 #   ./git-commit.sh           # Copies prompt to clipboard (for manual paste)
-#   ./git-commit.sh --api     # Uses Gemini API directly (requires API key)
+#   ./git-commit.sh --api     # Uses Groq API directly (requires API key)
 #   ./git-commit.sh --help    # Shows this help
 #
 # REQUIREMENTS:
 #   - Git repository with staged changes
-#   - For --api mode: GEMINI_API_KEY environment variable set
+#   - For --api mode: GROQ_API_KEY environment variable set
 #
 # AI TECHNIQUE: R-C-T-F Framework + Constraint-Based Prompting
 # ============================================================================
@@ -40,7 +40,7 @@ show_help() {
     echo ""
     echo "USAGE:"
     echo "  ./git-commit.sh           Copy prompt to clipboard (manual mode)"
-    echo "  ./git-commit.sh --api     Use Gemini API directly (auto mode)"
+    echo "  ./git-commit.sh --api     Use Groq API directly (auto mode)"
     echo "  ./git-commit.sh --help    Show this help"
     echo ""
     echo "MANUAL MODE:"
@@ -52,18 +52,18 @@ show_help() {
     echo "  6. Run: git commit -m \"message\""
     echo ""
     echo "API MODE:"
-    echo "  1. Set GEMINI_API_KEY environment variable"
+    echo "  1. Set GROQ_API_KEY environment variable"
     echo "  2. Stage your changes: git add ."
     echo "  3. Run: ./git-commit.sh --api"
     echo "  4. Message generated and shown"
     echo "  5. Confirm to commit or edit"
     echo ""
-    echo "SETUP GEMINI API KEY:"
-    echo "  export GEMINI_API_KEY='your-api-key-here'"
+    echo "SETUP GROQ API KEY:"
+    echo "  export GROQ_API_KEY='your-api-key-here'"
     echo "  # Add to ~/.bashrc or ~/.zshrc for persistence"
     echo ""
     echo "GET FREE API KEY:"
-    echo "  https://makersuite.google.com/app/apikey"
+    echo "  https://console.groq.com/keys"
     echo ""
 }
 
@@ -202,7 +202,7 @@ $DIFF"
 }
 
 # ============================================================================
-# API MODE (Gemini)
+# API MODE (Groq)
 # ============================================================================
 
 run_api_mode() {
@@ -214,13 +214,13 @@ run_api_mode() {
     check_staged_changes
 
     # Check for API key
-    if [ -z "$GEMINI_API_KEY" ]; then
-        echo -e "${RED}Error: GEMINI_API_KEY environment variable not set.${NC}"
+    if [ -z "$GROQ_API_KEY" ]; then
+        echo -e "${RED}Error: GROQ_API_KEY environment variable not set.${NC}"
         echo ""
         echo "Setup:"
-        echo "  1. Get free API key: https://makersuite.google.com/app/apikey"
+        echo "  1. Get free API key: https://console.groq.com/keys"
         echo "  2. Set environment variable:"
-        echo "     export GEMINI_API_KEY='your-key-here'"
+        echo "     export GROQ_API_KEY='your-key-here'"
         echo ""
         echo "Or use manual mode: ./git-commit.sh"
         exit 1
@@ -245,26 +245,25 @@ $DIFF"
     # Escape for JSON
     ESCAPED_PROMPT=$(echo "$PROMPT" | jq -Rs '.')
 
-    # Build request body
+    # Build request body (OpenAI-compatible format for Groq)
     REQUEST_BODY=$(cat << EOF
 {
-  "contents": [{
-    "parts": [{
-      "text": $ESCAPED_PROMPT
-    }]
+  "model": "llama-3.3-70b-versatile",
+  "messages": [{
+    "role": "user",
+    "content": $ESCAPED_PROMPT
   }],
-  "generationConfig": {
-    "temperature": 0.3,
-    "maxOutputTokens": 500
-  }
+  "temperature": 0.3,
+  "max_tokens": 500
 }
 EOF
 )
 
-    # Call Gemini API
+    # Call Groq API
     RESPONSE=$(curl -s -X POST \
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$GEMINI_API_KEY" \
+        "https://api.groq.com/openai/v1/chat/completions" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $GROQ_API_KEY" \
         -d "$REQUEST_BODY")
 
     # Check for errors
@@ -274,8 +273,8 @@ EOF
         exit 1
     fi
 
-    # Extract message
-    COMMIT_MSG=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed 's/^```//g' | sed 's/```$//g' | xargs)
+    # Extract message (OpenAI format)
+    COMMIT_MSG=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' | sed 's/^```//g' | sed 's/```$//g' | xargs)
 
     if [ -z "$COMMIT_MSG" ] || [ "$COMMIT_MSG" = "null" ]; then
         echo -e "${RED}Error: Could not parse API response.${NC}"
