@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workshop - Documentation Hub</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Search */
+        .search-container {
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .section-header:hover {
+            background: var(--bg-hover);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        .section-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--primary);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .section-toggle {
+            font-size: 1.25rem;
+            transition: transform 0.3s;
+            color: var(--text-muted);
+        }
+
+        .section.open .section-toggle {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .section.open .section-content {
+            max-height: 2000px;
+        }
+
+        .section-body {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--bg-hover);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        .tag.technique {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        /* Techniques Reference */
+        .techniques-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .technique-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .technique-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .technique-name {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .technique-name::after {
+            content: "→";
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        .technique-def {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .technique-when {
+            font-size: 0.8rem;
+            color: var(--secondary);
+        }
+
+        .click-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            border: 1px solid var(--border);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .modal-close {
+            background: var(--bg-hover);
+            border: none;
+            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-section-content {
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        /* Code blocks in modal */
+        .code-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .code-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-label.good::before {
+            content: "✅";
+        }
+
+        .code-label.bad::before {
+            content: "❌";
+        }
+
+        .example-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+        }
+
+        .example-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--warning);
+        }
+
+        .vs-divider {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 0.75rem 0;
+        }
+
+        .tip-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tip-box-title {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quick Start */
+        .quick-start {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-start h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .quick-start-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+        }
+
+        /* Tools */
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .tool-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        /* Hidden state for search */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Code */
+        code {
+            background: var(--bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .quick-start-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Workshop Documentation</h1>
+            <p class="subtitle">Prompting Techniques & Automation Templates for Free AI Tools</p>
+        </header>
+
+        <!-- Quick Start -->
+        <div class="quick-start">
+            <h3>Quick Start</h3>
+            <div class="quick-start-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <span class="step-text">Choose a template from below based on your task</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <span class="step-text">Open the <code>.md</code> file and copy the prompt</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span class="step-text">Paste into ChatGPT, Gemini, or your AI tool</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <span class="step-text">Or run <code>.sh</code> scripts for automation</span>
+                </div>
+            </div>
+            <div class="tools-list">
+                <span class="tool-badge">ChatGPT (Free)</span>
+                <span class="tool-badge">Google Gemini</span>
+                <span class="tool-badge">Continue.dev</span>
+                <span class="tool-badge">Codeium</span>
+                <span class="tool-badge">Cursor</span>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <input type="text" class="search-input" id="search" placeholder="Search templates, techniques, or keywords... (Press '/' to focus)">
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="project">Project Docs</button>
+            <button class="filter-tab" data-filter="git">Git Automation</button>
+            <button class="filter-tab" data-filter="automation">Workflow</button>
+            <button class="filter-tab" data-filter="technique">Techniques</button>
+        </div>
+
+        <!-- Techniques Reference Section -->
+        <div class="section open" data-category="technique">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">🧠</span>
+                    <span>AI Prompting Techniques Reference</span>
+                    <span class="section-badge">7 Techniques</span>
+                </div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="section-body">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                        Click on any technique to see detailed explanation and examples
+                    </p>
+                    <div class="techniques-grid">
+                        <div class="technique-card" data-technique="rctf" data-keywords="rctf role context task format structure">
+                            <div class="technique-name">R-C-T-F Framework</div>
+                            <div class="technique-def">Structure prompts with Role, Context, Task, and Format for consistent, high-quality outputs.</div>
+                            <div class="technique-when">Use for: Any prompt where you need specific, structured output</div>
+                        </div>
+                        <div class="technique-card" data-technique="zero-shot" data-keywords="zero shot simple direct no examples">
+                            <div class="technique-name">Zero-Shot Prompting</div>
+                            <div class="technique-def">Ask AI to perform a task with no examples - just clear instructions.</div>
+                            <div class="technique-when">Use for: Simple, well-defined tasks where AI's default knowledge is enough</div>
+                        </div>
+                        <div class="technique-card" data-technique="few-shot" data-keywords="few shot examples pattern learning">
+                            <div class="technique-name">Few-Shot Prompting</div>
+                            <div class="technique-def">Provide 2-4 examples before your request so AI learns the pattern you want.</div>
+                            <div class="technique-when">Use for: Consistent formatting, specific style, custom transformations</div>
+                        </div>
+                        <div class="technique-card" data-technique="cot" data-keywords="chain of thought cot reasoning step by step">
+                            <div class="technique-name">Chain of Thought (CoT)</div>
+                            <div class="technique-def">Ask AI to "think step by step" before giving the final answer.</div>
+                            <div class="technique-when">Use for: Complex problems, debugging, logic-heavy tasks</div>
+                        </div>
+                        <div class="technique-card" data-technique="role-based" data-keywords="role based persona expert">
+                            <div class="technique-name">Role-Based Prompting</div>
+                            <div class="technique-def">Assign AI a specific expert persona before the task.</div>
+                            <div class="technique-when">Use for: Domain-specific expertise, different perspectives</div>
+                        </div>
+                        <div class="technique-card" data-technique="constraint" data-keywords="constraint based limits boundaries rules">
+                            <div class="technique-name">Constraint-Based Prompting</div>
+                            <div class="technique-def">Set explicit boundaries on what AI can/cannot do, include or exclude.</div>
+                            <div class="technique-when">Use for: Focused answers, specific limits, excluding solutions</div>
+                        </div>
+                        <div class="technique-card" data-technique="iterative" data-keywords="iterative refinement follow up improve">
+                            <div class="technique-name">Iterative Refinement</div>
+                            <div class="technique-def">Build on AI's response with follow-up prompts to improve output.</div>
+                            <div class="technique-when">Use for: Complex documents, when first output needs improvement</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Documentation Section -->
+        <div class="section open" data-category="project">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">📁</span>
+                    <span>Project Documentation Templates</span>
+                    <span class="section-badge">4 Files</span>
+                </div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="section-body">
+                    <div class="card-grid">
+                        <a href="Project/README.md" class="card" data-keywords="readme overview tech stack quick start setup">
+                            <div class="card-title">📄 README.md</div>
+                            <div class="card-desc">Project overview template with tech stack, quick start, and commands. Feed to AI for project understanding.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">R-C-T-F</span>
+                                <span class="tag technique">Zero-Shot</span>
+                                <span class="tag">Project Setup</span>
+                            </div>
+                        </a>
+                        <a href="Project/PROJECT_CONTEXT.md" class="card" data-keywords="context business logic user flows rules domain">
+                            <div class="card-title">📋 PROJECT_CONTEXT.md</div>
+                            <div class="card-desc">Business context, user flows, domain glossary. Helps AI understand the "why" behind your code.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Role-Based</span>
+                                <span class="tag technique">Few-Shot</span>
+                                <span class="tag">Business Logic</span>
+                            </div>
+                        </a>
+                        <a href="Project/CODING_GUIDELINES.md" class="card" data-keywords="coding guidelines conventions naming patterns style">
+                            <div class="card-title">📏 CODING_GUIDELINES.md</div>
+                            <div class="card-desc">Code conventions, naming patterns, do's and don'ts. AI generates code matching your style.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Constraint-Based</span>
+                                <span class="tag technique">Few-Shot</span>
+                                <span class="tag">Code Style</span>
+                            </div>
+                        </a>
+                        <a href="Project/ARCHITECTURE.md" class="card" data-keywords="architecture system design data flow decisions">
+                            <div class="card-title">🏗️ ARCHITECTURE.md</div>
+                            <div class="card-desc">System architecture, data flow, technical decisions. For "where should this code go" questions.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Chain of Thought</span>
+                                <span class="tag technique">Role-Based</span>
+                                <span class="tag">System Design</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Git Automation Section -->
+        <div class="section" data-category="git">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">🔀</span>
+                    <span>Git Automation</span>
+                    <span class="section-badge">3 Tools</span>
+                </div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="section-body">
+                    <div class="card-grid">
+                        <a href="GIT/GitCommit/git-commit-prompt.md" class="card" data-keywords="commit message conventional git staged changes">
+                            <div class="card-title">💬 Git Commit Generator</div>
+                            <div class="card-desc">Generate conventional commit messages from your staged changes. Includes shell script for automation.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">R-C-T-F</span>
+                                <span class="tag technique">Constraint-Based</span>
+                                <span class="tag">Shell Script</span>
+                            </div>
+                        </a>
+                        <a href="GIT/GitPRReviewer/pr-review-prompt.md" class="card" data-keywords="pr review code review pull request bugs security">
+                            <div class="card-title">🔍 PR Code Reviewer</div>
+                            <div class="card-desc">AI-powered code review before submitting PRs. Catches bugs, security issues, and style problems.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Role-Based</span>
+                                <span class="tag technique">Constraint-Based</span>
+                                <span class="tag">Shell Script</span>
+                            </div>
+                        </a>
+                        <a href="GIT/GitArchitectureReviewer/architecture-review-prompt.md" class="card" data-keywords="architecture review system design scaling failure">
+                            <div class="card-title">🏛️ Architecture Reviewer</div>
+                            <div class="card-desc">Review architectural decisions before implementation. Analyzes scaling, failure modes, and alternatives.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Chain of Thought</span>
+                                <span class="tag technique">Iterative</span>
+                                <span class="tag">Shell Script</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: 8px;">
+                        <strong>Shell Scripts:</strong> Each tool includes a <code>.sh</code> script with two modes:
+                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem; color: var(--text-muted);">
+                            <li><strong>Manual:</strong> Copies prompt to clipboard for paste into any AI tool</li>
+                            <li><strong>API:</strong> Uses Gemini API directly (requires <code>GEMINI_API_KEY</code>)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Automation Section -->
+        <div class="section" data-category="automation">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon">⚡</span>
+                    <span>Workflow Automation</span>
+                    <span class="section-badge">2 Templates</span>
+                </div>
+                <span class="section-toggle">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="section-body">
+                    <div class="card-grid">
+                        <a href="Automation/create-prd.md" class="card" data-keywords="prd product requirements document feature planning">
+                            <div class="card-title">📝 Create PRD</div>
+                            <div class="card-desc">Generate Product Requirements Documents from feature ideas. Includes clarifying questions flow.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">R-C-T-F</span>
+                                <span class="tag technique">Iterative</span>
+                                <span class="tag">Planning</span>
+                            </div>
+                        </a>
+                        <a href="Automation/generate-tasks.md" class="card" data-keywords="tasks task list breakdown implementation checklist">
+                            <div class="card-title">✅ Generate Task List</div>
+                            <div class="card-desc">Break down PRDs or features into actionable task lists with checkboxes for tracking progress.</div>
+                            <div class="card-tags">
+                                <span class="tag technique">Chain of Thought</span>
+                                <span class="tag technique">Few-Shot</span>
+                                <span class="tag">Implementation</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg); border-radius: 8px;">
+                        <strong>Recommended Workflow:</strong>
+                        <div style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                            Feature Idea → <strong>Create PRD</strong> → <strong>Generate Tasks</strong> → Implementation → <strong>PR Review</strong> → Merge
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>AI Workshop Materials | Use with any free AI tool</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://chat.openai.com" style="color: var(--primary); text-decoration: none;">ChatGPT</a> ·
+                <a href="https://gemini.google.com" style="color: var(--primary); text-decoration: none;">Gemini</a> ·
+                <a href="https://continue.dev" style="color: var(--primary); text-decoration: none;">Continue.dev</a> ·
+                <a href="https://codeium.com" style="color: var(--primary); text-decoration: none;">Codeium</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="modal-title">Technique Name</div>
+                    <div class="modal-subtitle" id="modal-subtitle">Short description</div>
+                </div>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Technique data with details and examples
+        const techniqueData = {
+            'rctf': {
+                title: 'R-C-T-F Framework',
+                subtitle: 'The foundation of effective AI prompting',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            A structured approach to writing prompts using four key components:
+                            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                <li><strong>R = Role:</strong> Who should AI pretend to be?</li>
+                                <li><strong>C = Context:</strong> What background info does AI need?</li>
+                                <li><strong>T = Task:</strong> What specific action should AI take?</li>
+                                <li><strong>F = Format:</strong> How should the output look?</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Why use it?</div>
+                        <div class="modal-section-content">
+                            AI has ALL knowledge but doesn't know WHICH knowledge to apply. R-C-T-F tells it exactly what perspective, context, and output format you need.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example</div>
+                        <div class="example-box">
+                            <div class="code-label bad">Bad Prompt (No structure)</div>
+                            <div class="code-block">Write code for email validation</div>
+
+                            <div class="vs-divider">— vs —</div>
+
+                            <div class="code-label good">Good Prompt (Using R-C-T-F)</div>
+                            <div class="code-block"><strong>ROLE:</strong> You are a senior TypeScript developer who writes production-grade code.
+
+<strong>CONTEXT:</strong> I'm building a user registration form for a B2B SaaS app. Users have complex email formats (subdomains, plus addressing).
+
+<strong>TASK:</strong> Write an email validation function that:
+1. Validates standard email formats
+2. Handles edge cases (user+tag@domain.com)
+3. Returns specific error messages
+
+<strong>FORMAT:</strong>
+- TypeScript function with types
+- JSDoc comments
+- 5 test cases at the bottom</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Pro Tip</div>
+                        Think of R-C-T-F like briefing a new team member. The more context you give, the better the output.
+                    </div>
+                `
+            },
+            'zero-shot': {
+                title: 'Zero-Shot Prompting',
+                subtitle: 'Direct instructions without examples',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Asking AI to perform a task with NO examples — just clear, direct instructions. The AI uses its pre-trained knowledge to complete the task.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">When to use</div>
+                        <div class="modal-section-content">
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Simple, well-defined tasks</li>
+                                <li>When AI's default knowledge is sufficient</li>
+                                <li>Quick questions with clear answers</li>
+                                <li>Standard formats (JSON, markdown, etc.)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example</div>
+                        <div class="example-box">
+                            <div class="example-title">Converting JavaScript to Python</div>
+                            <div class="code-block">Convert this JavaScript function to Python:
+
+function calculateTotal(items) {
+    return items.reduce((sum, item) =>
+        sum + item.price * item.quantity, 0);
+}</div>
+
+                            <div style="margin-top: 1rem; color: var(--secondary); font-size: 0.85rem;">
+                                ✓ No examples needed — AI knows both languages
+                            </div>
+                        </div>
+
+                        <div class="example-box" style="margin-top: 1rem;">
+                            <div class="example-title">Summarizing Text</div>
+                            <div class="code-block">Summarize this paragraph in 2 sentences:
+
+[Your text here]</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 When NOT to use Zero-Shot</div>
+                        When you need specific formatting, custom styles, or non-standard outputs — use Few-Shot instead.
+                    </div>
+                `
+            },
+            'few-shot': {
+                title: 'Few-Shot Prompting',
+                subtitle: 'Teaching by example',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Providing 2-4 examples BEFORE your actual request, so AI learns the exact pattern, format, or style you want.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">When to use</div>
+                        <div class="modal-section-content">
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Consistent formatting across outputs</li>
+                                <li>Specific tone or writing style</li>
+                                <li>Custom transformations</li>
+                                <li>Non-obvious output structures</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example</div>
+                        <div class="example-box">
+                            <div class="example-title">Converting Error Codes to User Messages</div>
+                            <div class="code-block">Convert error codes to user-friendly messages:
+
+<strong>Example 1:</strong>
+Input: "ERR_CONNECTION_REFUSED"
+Output: "We couldn't reach the server. Please check your internet connection."
+
+<strong>Example 2:</strong>
+Input: "AUTH_TOKEN_EXPIRED"
+Output: "Your session has expired. Please sign in again."
+
+<strong>Example 3:</strong>
+Input: "VALIDATION_FAILED_EMAIL"
+Output: "The email address doesn't look right. Please check the format."
+
+<strong>Now convert:</strong>
+Input: "RATE_LIMIT_EXCEEDED"</div>
+
+                            <div style="margin-top: 1rem; color: var(--secondary); font-size: 0.85rem;">
+                                ✓ AI learns the tone and format from examples
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Pro Tip</div>
+                        2-4 examples is the sweet spot. Too few = inconsistent output. Too many = wasted tokens.
+                    </div>
+                `
+            },
+            'cot': {
+                title: 'Chain of Thought (CoT)',
+                subtitle: 'Step-by-step reasoning',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Asking AI to "think step by step" or show its reasoning process before giving a final answer. Like asking someone to show their work in math.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">When to use</div>
+                        <div class="modal-section-content">
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Complex problems with multiple steps</li>
+                                <li>Debugging code or logic</li>
+                                <li>Architecture decisions</li>
+                                <li>Anywhere you need to SEE the reasoning</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example</div>
+                        <div class="example-box">
+                            <div class="example-title">Debugging a React Component</div>
+                            <div class="code-block">I have a React component that re-renders infinitely.
+
+<strong>Think through this step-by-step:</strong>
+1. First, identify what typically causes infinite re-renders
+2. Then, analyze this specific code for each cause
+3. Finally, provide the fix with explanation
+
+const UserProfile = ({ userId }) => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        fetchUser(userId).then(setUser);
+    }); // Missing dependency array!
+
+    return <div>{user?.name}</div>;
+};</div>
+
+                            <div style="margin-top: 1rem; color: var(--secondary); font-size: 0.85rem;">
+                                ✓ AI walks through its reasoning, making errors visible
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Trigger Phrases</div>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li>"Think step by step"</li>
+                            <li>"Walk me through your reasoning"</li>
+                            <li>"First analyze X, then consider Y, finally recommend Z"</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'role-based': {
+                title: 'Role-Based Prompting',
+                subtitle: 'Expert personas for better answers',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Assigning AI a specific expert persona before the task. Different roles produce different perspectives on the same problem.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Why it works</div>
+                        <div class="modal-section-content">
+                            AI contains knowledge from many perspectives. The role tells it WHICH expert's viewpoint to use — security engineer vs UX designer vs business analyst will give very different answers.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example: Same Question, Different Roles</div>
+                        <div class="example-box">
+                            <div class="example-title">Question: "How should we handle user authentication?"</div>
+
+                            <div class="code-block" style="margin-top: 1rem;"><strong>Role: Security Engineer</strong>
+→ "Use JWT with refresh tokens, implement rate limiting,
+   add 2FA, hash passwords with bcrypt, validate all inputs..."</div>
+
+                            <div class="code-block"><strong>Role: UX Designer</strong>
+→ "Keep login simple, offer social login options (Google, GitHub),
+   remember user preferences, clear error messages..."</div>
+
+                            <div class="code-block"><strong>Role: Business Analyst</strong>
+→ "Consider conversion rates, reduce login friction,
+   track abandonment, A/B test login flows..."</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Useful Roles</div>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li><strong>Senior [X] Developer</strong> — for code quality</li>
+                            <li><strong>Security Engineer</strong> — for vulnerability review</li>
+                            <li><strong>Code Reviewer</strong> — for PR feedback</li>
+                            <li><strong>Technical Writer</strong> — for documentation</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'constraint': {
+                title: 'Constraint-Based Prompting',
+                subtitle: 'Setting boundaries for focused output',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Setting explicit boundaries on what AI can/cannot do, should/should not include. Like telling a contractor "budget is $10K, must be done in 2 weeks, no structural changes."
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Why it works</div>
+                        <div class="modal-section-content">
+                            Without constraints, AI gives generic, bloated answers. Constraints focus the response on exactly what you need and prevent unwanted suggestions.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example</div>
+                        <div class="example-box">
+                            <div class="example-title">Performance Optimization with Constraints</div>
+                            <div class="code-block">Suggest ways to improve this function's performance.
+
+<strong>CONSTRAINTS:</strong>
+- Do NOT suggest changing the data structure (locked into API format)
+- Do NOT suggest caching (we need real-time data)
+- Do NOT use any external libraries
+- Maximum 3 suggestions
+- Each must include Big O improvement
+
+function findDuplicates(arr) {
+    const duplicates = [];
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+            if (arr[i] === arr[j] && !duplicates.includes(arr[i])) {
+                duplicates.push(arr[i]);
+            }
+        }
+    }
+    return duplicates;
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Common Constraints</div>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li>"Maximum X lines/items"</li>
+                            <li>"Do NOT use [specific thing]"</li>
+                            <li>"Must include [specific thing]"</li>
+                            <li>"Only use [specific technologies]"</li>
+                            <li>"Keep it under X minutes to implement"</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'iterative': {
+                title: 'Iterative Refinement',
+                subtitle: 'Building on AI responses',
+                content: `
+                    <div class="modal-section">
+                        <div class="modal-section-title">What is it?</div>
+                        <div class="modal-section-content">
+                            Building on AI's response with follow-up prompts to improve and refine the output. Think of it like sculpting — start with a rough shape, then refine details.
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">When to use</div>
+                        <div class="modal-section-content">
+                            <ul style="margin-left: 1.5rem;">
+                                <li>Complex documents (PRDs, documentation)</li>
+                                <li>When first output needs improvement</li>
+                                <li>When requirements evolve</li>
+                                <li>Fine-tuning tone or detail level</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-title">Example Sequence</div>
+                        <div class="example-box">
+                            <div class="code-block"><strong>Prompt 1:</strong>
+Write a README for a Node.js REST API that manages a todo list.</div>
+
+                            <div style="text-align: center; color: var(--text-muted); padding: 0.5rem;">↓ AI generates initial README ↓</div>
+
+                            <div class="code-block"><strong>Prompt 2 (Refinement):</strong>
+Good start. Now improve it:
+1. Add a "Quick Start" section with terminal commands
+2. Add API endpoint table with example requests
+3. Make installation steps numbered, not bullets</div>
+
+                            <div style="text-align: center; color: var(--text-muted); padding: 0.5rem;">↓ AI improves README ↓</div>
+
+                            <div class="code-block"><strong>Prompt 3 (Final Polish):</strong>
+Almost there. Final tweaks:
+- Add "Troubleshooting" section with 3 common issues
+- Add environment variables table
+- Remove the Contributing section</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">💡 Refinement Phrases</div>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li>"Good, but add more detail to [section]"</li>
+                            <li>"Make it more [concise/detailed/technical]"</li>
+                            <li>"Remove [X] and expand [Y]"</li>
+                            <li>"Keep everything but change [specific part]"</li>
+                        </ul>
+                    </div>
+                `
+            }
+        };
+
+        // Modal functionality
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const modalBody = document.getElementById('modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        function openModal(techniqueId) {
+            const data = techniqueData[techniqueId];
+            if (!data) return;
+
+            modalTitle.textContent = data.title;
+            modalSubtitle.textContent = data.subtitle;
+            modalBody.innerHTML = data.content;
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners for technique cards
+        document.querySelectorAll('.technique-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const techniqueId = card.dataset.technique;
+                openModal(techniqueId);
+            });
+        });
+
+        // Close modal events
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Toggle sections
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                header.parentElement.classList.toggle('open');
+            });
+        });
+
+        // Filter tabs
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const sections = document.querySelectorAll('.section');
+
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const filter = tab.dataset.filter;
+
+                // Update active tab
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Filter sections
+                sections.forEach(section => {
+                    if (filter === 'all' || section.dataset.category === filter) {
+                        section.classList.remove('hidden');
+                        section.classList.add('open');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        const cards = document.querySelectorAll('.card');
+        const techniqueCards = document.querySelectorAll('.technique-card');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+
+            if (!query) {
+                // Show all
+                cards.forEach(card => card.classList.remove('hidden'));
+                techniqueCards.forEach(card => card.classList.remove('hidden'));
+                sections.forEach(section => section.classList.remove('hidden'));
+                return;
+            }
+
+            // Search cards
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+                const keywords = (card.dataset.keywords || '').toLowerCase();
+                const tags = card.querySelector('.card-tags').textContent.toLowerCase();
+
+                const matches = title.includes(query) ||
+                               desc.includes(query) ||
+                               keywords.includes(query) ||
+                               tags.includes(query);
+
+                card.classList.toggle('hidden', !matches);
+            });
+
+            // Search technique cards
+            techniqueCards.forEach(card => {
+                const name = card.querySelector('.technique-name').textContent.toLowerCase();
+                const def = card.querySelector('.technique-def').textContent.toLowerCase();
+                const keywords = (card.dataset.keywords || '').toLowerCase();
+
+                const matches = name.includes(query) ||
+                               def.includes(query) ||
+                               keywords.includes(query);
+
+                card.classList.toggle('hidden', !matches);
+            });
+
+            // Show sections that have visible content
+            sections.forEach(section => {
+                const visibleCards = section.querySelectorAll('.card:not(.hidden), .technique-card:not(.hidden)');
+                section.classList.toggle('hidden', visibleCards.length === 0);
+                if (visibleCards.length > 0) {
+                    section.classList.add('open');
+                }
+            });
+
+            // Reset filter tabs
+            filterTabs.forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+        });
+
+        // Keyboard shortcut for search
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== searchInput && !modalOverlay.classList.contains('active')) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
